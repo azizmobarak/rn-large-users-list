@@ -1,6 +1,6 @@
 import {UserState} from '../screens/UsersListScroll/usersReducer';
 
-export enum RmoteData {
+export enum RemoteData {
   Loading,
   Data,
   Error,

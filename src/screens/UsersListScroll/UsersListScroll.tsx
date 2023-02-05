@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -6,32 +6,40 @@ import {
   StyleSheet,
   TextStyle,
   ActivityIndicator,
+  Button,
 } from 'react-native';
-import { UserList, UserState } from './usersReducer';
-import { Screens } from '../../services/Navigation/Screens';
-import { useNavigation } from '@react-navigation/native';
+import {UsersListState} from './usersReducer';
+import {Screens} from '../../services/Navigation/Screens';
+import {useNavigation} from '@react-navigation/native';
 import headerBuilder from '../../services/Navigation/headerBuilder';
 import CustomizedFlatList from '../../components/flatList';
-import { useDispatchUserListAction } from './useDispatchUserListAction';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../reducer/RootReducer';
+import {getUsersList} from './getUserListService';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../reducer/RootReducer';
+import RemoteDataComponent from '../../components/RemoteData';
 
 function UsersScreen() {
   // const dispatch = useDispatch();
   const navigation = useNavigation();
+  const [usersData, setUsersData] = useState([]);
   const [end, setEnd] = useState(1);
   const [isLoading, setLoading] = useState<boolean>(false);
-  const dispatchList = useDispatchUserListAction(end);
-  const state: UserList = useSelector<RootState>(state => state.usersReducer);
+  const {users, currentPage, state}: any = useSelector<RootState>(
+    _state => _state.usersReducer,
+  );
 
-  navigation.addListener('focus', () => dispatchList);
-  navigation.addListener('blur', () => dispatchList);
+  useEffect(() => {
+    setUsersData(users as []);
+  }, [users]);
+
+  navigation.addListener('focus', () => getUsersList(end));
+  navigation.addListener('blur', () => getUsersList(end));
 
   const onEnd = () => {
     const newEnd: number = end + 1;
     setEnd(newEnd);
-    const loadingState = end === newEnd;
-    setLoading(loadingState);
+    setLoading(true);
+    getUsersList(end);
   };
 
   useEffect(() => {
@@ -42,14 +50,29 @@ function UsersScreen() {
     );
   }, [navigation]);
 
-  return (
+  const renderError = () => (
+    <View style={styles.error}>
+      <Text style={styles.errorText}>Error No Data Provided</Text>
+      <Button
+        title={'referch'}
+        onPress={() => getUsersList(end)}
+        color={'#8777'}
+      />
+    </View>
+  );
+
+  const renderLoding = () => (
+    <View style={styles.emptyListLoader}>
+      <ActivityIndicator color={'black'} />
+    </View>
+  );
+
+  const renderView = () => (
     <View style={styles.container}>
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity
-          style={[styles.button, getColor('#677992')]}
-          onPress={onEnd}>
-          <Text style={styles.buttonText}>Next page {end}</Text>
-        </TouchableOpacity>
+        <View style={[styles.button, getColor('#677992')]}>
+          <Text style={styles.buttonText}>Next page {currentPage}</Text>
+        </View>
       </View>
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
@@ -60,13 +83,29 @@ function UsersScreen() {
           <Text style={styles.buttonText}>pagination</Text>
         </TouchableOpacity>
       </View>
-      <CustomizedFlatList data={state.users} />
-      {isLoading && (
+      <CustomizedFlatList onEnd={onEnd} data={usersData} />
+      {isBottomLoader()}
+    </View>
+  );
+
+  const isBottomLoader = () => {
+    if (isLoading) {
+      return (
         <View style={styles.loader}>
           <ActivityIndicator color={'#ffff'} />
         </View>
-      )}
-    </View>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <RemoteDataComponent
+      renderView={renderView}
+      renderLoading={renderLoding}
+      renderError={renderError}
+      state={state}
+    />
   );
 }
 
@@ -101,6 +140,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#336648',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  emptyListLoader: {flex: 1, alignItems: 'center', justifyContent: 'center'},
+  error: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  errorText: {
+    fontSize: 24,
+    color: 'red',
+    fontWeight: '600',
+  },
+  referchButton: {
+    width: 100,
   },
 });
 

@@ -1,5 +1,5 @@
 import {Observable} from 'rxjs';
-import {RestService} from './restService';
+import {RestService} from './RESTService';
 import {BASE_URL} from '../../base/baseURL';
 import {ListUsersResponse} from '../../utils/typing';
 
@@ -13,8 +13,8 @@ export class RestServicesImp implements RestService {
           sunscribe.next(result);
           sunscribe.complete();
         })
-        .catch(error => {
-          sunscribe.error(error);
+        .catch(() => {
+          sunscribe.next(undefined);
           sunscribe.complete();
         });
     });

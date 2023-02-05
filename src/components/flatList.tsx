@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   FlatList,
   View,
@@ -8,6 +8,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import {UserState} from '../screens/UsersListScroll/usersReducer';
+import {generateKeyExtrator} from '../utils/strings';
 
 type Props = {
   data: UserState[];
@@ -15,20 +16,47 @@ type Props = {
 };
 
 export default function CustomizedFlatList(props: Props) {
+  const [refreshing, setIsRefreshing] = useState(false);
+
+  const onRefrech = (onEnd: (() => void) | undefined): boolean => {
+    setIsRefreshing(true);
+    if (!onEnd) {
+      return false;
+    }
+    onEnd();
+    setIsRefreshing(false);
+    return true;
+  };
+
   return (
     <FlatList
       data={props.data}
-      keyExtractor={(item, index) => Math.random() * 200 * index + item.name}
+      keyExtractor={(item, index) => generateKeyExtrator(item.name)}
       renderItem={renderData}
       ItemSeparatorComponent={sparator}
       style={styles.list}
+      onEndReachedThreshold={0.5}
+      onEndReached={({distanceFromEnd}) => onEndHandler(distanceFromEnd)}
+      removeClippedSubviews={true}
+      initialNumToRender={100}
+      onRefresh={() => onRefrech(props.onEnd)}
+      refreshing={refreshing}
     />
   );
 }
 
+const onEndHandler = ({distanceFromEnd}: any) =>
+  //   onEnd: (() => void) | undefined,
+  {
+    if (distanceFromEnd >= 0) {
+      console.log('donnneee');
+      // return onEnd() ?? null;
+    }
+  };
+
 const renderData = (props: ListRenderItemInfo<UserState>) => {
   return (
-    <View style={styles.row} key={props.index}>
+    <View style={styles.row} key={generateKeyExtrator(props.index.toString())}>
       {props.item && (
         <Image source={{uri: props.item.image}} style={styles.image} />
       )}

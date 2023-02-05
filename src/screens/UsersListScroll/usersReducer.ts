@@ -1,5 +1,5 @@
 import {AnyAction, Reducer} from 'redux';
-import {RmoteData} from '../../utils/typing';
+import {ListUsersResponse, RemoteData} from '../../utils/typing';
 import {userListViewActionsType} from './actions';
 
 export interface UserState {
@@ -7,33 +7,48 @@ export interface UserState {
   image: string;
 }
 
-interface ListUsersResponse {
-  data: UserState[];
+export interface UsersListState {
+  users: UserState[];
+  state: RemoteData;
+  lastPage: number;
+  currentPage: number;
+  pageLenght: number;
+  onError: boolean;
 }
 
-export interface UserList {
-  users: ListUsersResponse[];
-  state: RmoteData;
-}
-
-const userListInitialState: UserList = {
+const userListInitialState: UsersListState = {
   users: [],
-  state: RmoteData.Loading,
+  state: RemoteData.Loading,
+  lastPage: 0,
+  currentPage: 0,
+  pageLenght: 0,
+  onError: false,
 };
 
-export const UsersReducer: Reducer<UserList> = (
-  state: UserList = userListInitialState,
+export const UsersReducer: Reducer<UsersListState> = (
+  state: UsersListState = userListInitialState,
   action: AnyAction,
-): UserList => {
-  console.log(action);
+): UsersListState => {
   switch (action.type) {
     case userListViewActionsType.fillUserList: {
-      const {data} = action.payload;
+      const {data, lastPage, currentPage, lenght}: ListUsersResponse =
+        action.payload;
+      console.log('cheeeck', currentPage);
       return {
+        ...state,
         users: data,
-        state: RmoteData.Data,
+        state: data.length > 1 ? RemoteData.Data : RemoteData.Loading,
+        lastPage,
+        currentPage,
+        pageLenght: lenght,
       };
     }
+
+    case userListViewActionsType.fillUserListError:
+      return {
+        ...state,
+        state: action.payload,
+      };
 
     default:
       return state;
