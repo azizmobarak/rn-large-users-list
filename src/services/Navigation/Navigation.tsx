@@ -1,7 +1,7 @@
 import React, {FC} from 'react';
 import {Screens} from './Screens';
 import {createStackNavigator} from '@react-navigation/stack';
-import {UserListScrollScreen} from '../../screens/UsersListScroll/UsersListScroll';
+import {UserListScrollScreen} from '../../screens/UsersListScroll/UsersListScrollScreen';
 import {NavigatorScreenParams} from '@react-navigation/native';
 import {UsersPaginationScreen} from '../../screens/UserListPagination/UsersPaginationScreen';
 

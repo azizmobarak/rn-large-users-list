@@ -13,3 +13,8 @@ export interface ListUsersResponse {
   lenght: number;
   lastPage: number;
 }
+
+export enum NavigationState {
+  Blur = 'blur',
+  Focus = 'focus',
+}

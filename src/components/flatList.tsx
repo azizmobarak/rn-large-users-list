@@ -31,7 +31,7 @@ export default function CustomizedFlatList(props: Props) {
   return (
     <FlatList
       data={props.data}
-      keyExtractor={(item, index) => generateKeyExtrator(item.name)}
+      keyExtractor={(item, _index) => generateKeyExtrator(item.name)}
       renderItem={renderData}
       ItemSeparatorComponent={sparator}
       style={styles.list}
@@ -93,5 +93,6 @@ const styles = StyleSheet.create({
   },
   list: {
     marginTop: 10,
+    width: '100%',
   },
 });

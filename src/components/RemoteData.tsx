@@ -3,8 +3,8 @@ import {RemoteData} from '../utils/typing';
 
 type Props = {
   renderView: () => React.ReactElement;
-    renderError: () => React.ReactElement;
-    renderLoading: () => React.ReactElement;
+  renderError: () => React.ReactElement;
+  renderLoading: () => React.ReactElement;
   state: RemoteData;
 };
 

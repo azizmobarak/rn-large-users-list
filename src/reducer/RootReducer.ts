@@ -1,12 +1,15 @@
 import {Reducer, combineReducers} from 'redux';
-import {UserList, UsersReducer} from '../screens/UsersListScroll/usersReducer';
+import {
+  UsersListState,
+  UsersReducer,
+} from '../screens/UsersListScroll/usersReducer';
 
 type ZippedReducersType<T> = {
   [key in keyof T]: Reducer<T[key]>;
 };
 
 export interface RootState {
-  usersReducer: UserList;
+  usersReducer: UsersListState;
 }
 
 const zipedReducer = (): ZippedReducersType<RootState> => ({

@@ -3,6 +3,6 @@ import {Screens} from '../../services/Navigation/Screens';
 
 const navigation = new Navigation();
 
-export const navigateToPaginationUserMiddlware = (): void => {
+export const navigateToPaginationScreen = (): void => {
   navigation.navigateTo(Screens.UsersPaginationScreen);
 };

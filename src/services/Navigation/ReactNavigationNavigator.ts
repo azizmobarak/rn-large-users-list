@@ -1,15 +1,16 @@
-import {NavigationProp} from '@react-navigation/native';
 import {NavigationService} from './NavigationService';
 import {Screens} from './Screens';
+import React, {RefObject} from 'react';
 
+export const navigationRef: RefObject<any> = React.createRef();
 export class Navigation implements NavigationService {
-  private navigationDispatcher?: NavigationProp<any>;
+  private navigationDispatcher?: RefObject<any> = navigationRef;
 
   navigateTo(screen: Screens) {
-    this.navigationDispatcher?.navigate(screen);
+    this.navigationDispatcher?.current.navigate(screen);
   }
 
   goBack() {
-    this.navigationDispatcher?.goBack();
+    this.navigationDispatcher?.current.goBack();
   }
 }
