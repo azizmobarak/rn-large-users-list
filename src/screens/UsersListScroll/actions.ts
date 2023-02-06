@@ -5,6 +5,7 @@ export const userListViewActionsType = {
   navigateToUserPagination: 'NAVIGATE_TO_USER_PAGINATION',
   fillUserList: 'FILL_USER_LIST',
   fillUserListError: 'FILL_USER_LIST_ERROR',
+  scrollToUsersByChart: 'SCROLL_TO_USERS_BY_CHART',
 };
 
 export const userListViewActions = {
@@ -21,4 +22,6 @@ export const userListViewActions = {
       userListViewActionsType.fillUserListError,
       payload,
     ),
+  scrollToChart: (payload: string) =>
+    createAction<string>(userListViewActionsType.scrollToUsersByChart, payload),
 };

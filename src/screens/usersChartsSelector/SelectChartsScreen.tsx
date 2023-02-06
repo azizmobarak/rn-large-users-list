@@ -12,7 +12,7 @@ function UsersScreen() {
   useEffect(() => {
     navigation.setOptions(
       headerBuilder({
-        title: 'Pagination',
+        title: 'Select Charts',
         goBack: navigation.goBack,
       }),
     );

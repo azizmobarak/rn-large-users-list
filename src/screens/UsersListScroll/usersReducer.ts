@@ -14,6 +14,7 @@ export interface UsersListState {
   currentPage: number;
   pageLenght: number;
   onError: boolean;
+  scrollToChart: string;
 }
 
 const userListInitialState: UsersListState = {
@@ -23,6 +24,7 @@ const userListInitialState: UsersListState = {
   currentPage: 0,
   pageLenght: 0,
   onError: false,
+  scrollToChart: 'A',
 };
 
 export const UsersReducer: Reducer<UsersListState> = (
@@ -48,6 +50,12 @@ export const UsersReducer: Reducer<UsersListState> = (
       return {
         ...state,
         state: action.payload,
+      };
+
+    case userListViewActionsType.scrollToUsersByChart:
+      return {
+        ...state,
+        scrollToChart: action.payload,
       };
 
     default:

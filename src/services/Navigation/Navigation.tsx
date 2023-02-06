@@ -3,7 +3,7 @@ import {Screens} from './Screens';
 import {createStackNavigator} from '@react-navigation/stack';
 import {UserListScrollScreen} from '../../screens/UsersListScroll/UsersListScrollScreen';
 import {NavigatorScreenParams} from '@react-navigation/native';
-import {UsersPaginationScreen} from '../../screens/UserListPagination/UsersPaginationScreen';
+import {UsersPaginationScreen} from '../../screens/usersChartsSelector/SelectChartsScreen';
 
 // ps: the comments here just for explaining and not nedeed since every function and var has a meaning by it's name
 

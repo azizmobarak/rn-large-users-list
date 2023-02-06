@@ -16,24 +16,24 @@ import {getUsersList} from './getUserListService';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../reducer/RootReducer';
 import RemoteDataComponent from '../../components/RemoteData';
-import {userPresenterPresentable} from './usersPresenter';
-import {navigateToPaginationScreen} from './helpers';
+import {buildUsersListPresenter} from './usersPresenter';
 import {NavigationState} from '../../utils/typing';
 
 function UsersScreen() {
   const navigation = useNavigation();
   const [usersData, setUsersData] = useState([]);
-  const [end, setEnd] = useState(1);
+  const [pageNumber, setPageNumber] = useState(1);
   const [isLoading, setLoading] = useState<boolean>(false);
   const {users, currentPage, state, lastPage}: any = useSelector<RootState>(
     _state => _state.usersReducer,
   );
   const [sortTo, setSortTo] = useState(1);
-  const {pagination} = userPresenterPresentable(
+  const {pagination, title} = buildUsersListPresenter(
     currentPage,
     lastPage,
     users,
     sortTo,
+    state,
   );
 
   useEffect(() => {
@@ -41,51 +41,54 @@ function UsersScreen() {
   }, [users]);
 
   useEffect(() => {
-    navigation.addListener(NavigationState.Focus, () => getUsersList(end));
+    navigation.addListener(NavigationState.Focus, () =>
+      getUsersList(pageNumber),
+    );
     return () =>
-      navigation.removeListener(NavigationState.Blur, () => getUsersList(end));
-  }, [end, navigation]);
+      navigation.removeListener(NavigationState.Blur, () =>
+        getUsersList(pageNumber),
+      );
+  }, [pageNumber, navigation]);
 
   const onEnd = () => {
-    const newEnd: number = end + 1;
-    setEnd(newEnd);
+    const newEnd: number = pageNumber + 1;
+    setPageNumber(newEnd);
     setLoading(true);
-    getUsersList(end);
+    getUsersList(pageNumber);
     setLoading(true);
+  };
+
+  const onRefrech = () => {
+    const newEnd: number = pageNumber + 1;
+    setPageNumber(newEnd);
+    getUsersList(pageNumber);
   };
 
   useEffect(() => {
     navigation.setOptions(
       headerBuilder({
-        title: 'Try Pagination & scroll Top Bottom',
+        title,
       }),
     );
-  }, [navigation]);
+  }, [navigation, title]);
 
-  const onNext = useCallback(() => {
-    const newEnd: number = end + 1;
-    setEnd(newEnd);
-    setLoading(true);
-    getUsersList(end);
-    setLoading(false);
-    console.log('p', end);
-  }, [end]);
-
-  const onPrevious = useCallback(() => {
-    const newEnd: number = end - 1;
-    setEnd(newEnd);
-    setLoading(true);
-    getUsersList(end);
-    setLoading(false);
-    console.log('p', end);
-  }, [end]);
+  const navigate = useCallback(
+    (isNext: boolean) => {
+      const newEnd: number = pageNumber + (isNext ? 1 : -1);
+      setPageNumber(newEnd);
+      setLoading(true);
+      getUsersList(pageNumber);
+      setLoading(false);
+    },
+    [pageNumber],
+  );
 
   const renderError = () => (
     <View style={styles.error}>
       <Text style={styles.errorText}>Error No Data Provided</Text>
       <Button
         title={'referch'}
-        onPress={() => getUsersList(end)}
+        onPress={() => getUsersList(pageNumber)}
         color={'#8777'}
       />
     </View>
@@ -100,12 +103,6 @@ function UsersScreen() {
   const renderView = () => (
     <View style={styles.container}>
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity
-          style={[styles.button, getColor('#677992')]}
-          onPress={navigateToPaginationScreen}>
-          <Text style={styles.buttonText}>Click to Switch to Scrolling</Text>
-        </TouchableOpacity>
-
         <View style={[styles.filterContainer, getColor('#675992')]}>
           <Text style={styles.filterText}>Sort List</Text>
           <View style={styles.filterListButtonsContainer}>
@@ -130,9 +127,14 @@ function UsersScreen() {
           </View>
         </View>
       </View>
-      <CustomizedFlatList onEnd={onEnd} data={usersData} />
+      <CustomizedFlatList
+        onRefrech={onRefrech}
+        onEnd={onEnd}
+        data={usersData}
+        scrollToChart={'B'}
+      />
       {isBottomLoader()}
-      {pagination.length > 0
+      {pagination.length === 4
         ? renderPagination()
         : renderPaginationSimpleButtons()}
     </View>
@@ -156,15 +158,17 @@ function UsersScreen() {
     return (
       <View style={styles.simplePaginationContainer}>
         <TouchableOpacity
-          onPress={onPrevious}
+          disabled={pageNumber === 1}
+          onPress={() => navigate(false)}
           style={styles.simplePaginationButtons}>
           <Text>{'<<<<'}</Text>
         </TouchableOpacity>
 
-        <Text>{end}</Text>
+        <Text>{pageNumber}</Text>
 
         <TouchableOpacity
-          onPress={onNext}
+          disabled={pageNumber === lastPage}
+          onPress={() => navigate(true)}
           style={styles.simplePaginationButtons}>
           <Text>{'>>>>'}</Text>
         </TouchableOpacity>
@@ -291,7 +295,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    width: '50%',
+    flex: 1,
   },
   filterButton: {
     height: 20,
