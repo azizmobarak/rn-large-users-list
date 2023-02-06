@@ -3,15 +3,13 @@ import {Screens} from './Screens';
 import {createStackNavigator} from '@react-navigation/stack';
 import {UserListScrollScreen} from '../../screens/UsersListScroll/UsersListScrollScreen';
 import {NavigatorScreenParams} from '@react-navigation/native';
-import {UsersPaginationScreen} from '../../screens/usersChartsSelector/SelectChartsScreen';
 
 // ps: the comments here just for explaining and not nedeed since every function and var has a meaning by it's name
 
 // navigation typing
-
+// any screen in navigation will be added here with params
 export type UsersNavigation = {
   [Screens.UsersListScreen]: undefined;
-  [Screens.UsersPaginationScreen]: undefined;
 };
 
 export type RootNavigation = {
@@ -29,10 +27,6 @@ const UsersNavigationNavigator: FC = () => {
   return (
     <Navigator>
       <Screen name={Screens.UsersListScreen} component={UserListScrollScreen} />
-      <Screen
-        name={Screens.UsersPaginationScreen}
-        component={UsersPaginationScreen}
-      />
     </Navigator>
   );
 };

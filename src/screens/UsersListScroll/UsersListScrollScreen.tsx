@@ -4,20 +4,20 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  TextStyle,
   ActivityIndicator,
   Button,
   ViewStyle,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import headerBuilder from '../../services/Navigation/headerBuilder';
-import CustomizedFlatList from '../../components/flatList';
+import CustomizedFlatList from '../../components/CustomizedFlatListWithHeader';
 import {getUsersList} from './getUserListService';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../reducer/RootReducer';
 import RemoteDataComponent from '../../components/RemoteData';
 import {buildUsersListPresenter} from './usersPresenter';
 import {NavigationState} from '../../utils/typing';
+import {BaseColors} from '../../theme/colors';
 
 function UsersScreen() {
   const navigation = useNavigation();
@@ -103,7 +103,7 @@ function UsersScreen() {
   const renderView = () => (
     <View style={styles.container}>
       <View style={styles.buttonsContainer}>
-        <View style={[styles.filterContainer, getColor('#675992')]}>
+        <View style={styles.filterContainer}>
           <Text style={styles.filterText}>Sort List</Text>
           <View style={styles.filterListButtonsContainer}>
             <TouchableOpacity
@@ -131,7 +131,6 @@ function UsersScreen() {
         onRefrech={onRefrech}
         onEnd={onEnd}
         data={usersData}
-        scrollToChart={'B'}
       />
       {isBottomLoader()}
       {pagination.length === 4
@@ -164,7 +163,9 @@ function UsersScreen() {
           <Text>{'<<<<'}</Text>
         </TouchableOpacity>
 
-        <Text>{pageNumber}</Text>
+        <Text style={styles.pageNumber}>
+          {pageNumber} / {lastPage}
+        </Text>
 
         <TouchableOpacity
           disabled={pageNumber === lastPage}
@@ -180,7 +181,7 @@ function UsersScreen() {
     if (isLoading) {
       return (
         <View style={styles.loader}>
-          <ActivityIndicator color={'#ffff'} />
+          <ActivityIndicator color={BaseColors.Secondary} />
         </View>
       );
     }
@@ -206,10 +207,6 @@ function UsersScreen() {
   );
 }
 
-const getColor = (color: string): TextStyle => ({
-  backgroundColor: color,
-});
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -220,7 +217,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '100%',
     borderColor: 'black',
-    borderWidth: 1,
     height: 30,
   },
   button: {
@@ -230,13 +226,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: {
-    color: 'white',
+    color: BaseColors.WhiteText,
   },
   loader: {
     width: '100%',
     height: 50,
     marginTop: 40,
-    backgroundColor: '#336648',
+    backgroundColor: BaseColors.Primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -248,7 +244,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 24,
-    color: 'red',
+    color: BaseColors.Error,
     fontWeight: '600',
   },
   referchButton: {
@@ -296,6 +292,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
     flex: 1,
+    backgroundColor: BaseColors.Primary,
   },
   filterButton: {
     height: 20,
@@ -312,8 +309,11 @@ const styles = StyleSheet.create({
     fontWeight: '200',
   },
   filterText: {
-    color: 'white',
+    color: BaseColors.WhiteText,
     fontStyle: 'italic',
+  },
+  pageNumber: {
+    marginHorizontal: 4,
   },
 });
 

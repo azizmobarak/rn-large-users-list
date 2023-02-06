@@ -24,7 +24,7 @@ const userListInitialState: UsersListState = {
   currentPage: 0,
   pageLenght: 0,
   onError: false,
-  scrollToChart: 'A',
+  scrollToChart: '',
 };
 
 export const UsersReducer: Reducer<UsersListState> = (

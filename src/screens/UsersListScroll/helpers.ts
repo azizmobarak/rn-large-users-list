@@ -1,8 +1,10 @@
-import {Navigation} from '../../services/Navigation/ReactNavigationNavigator';
-import {Screens} from '../../services/Navigation/Screens';
+// example of navigation function if needed
 
-const navigation = new Navigation();
+// import {Navigation} from '../../services/Navigation/ReactNavigationNavigator';
+// import {Screens} from '../../services/Navigation/Screens';
 
-export const navigateToPaginationScreen = (): void => {
-  navigation.navigateTo(Screens.UsersPaginationScreen);
-};
+// const navigation = new Navigation();
+
+// export const navigateToPaginationScreen = (): void => {
+//   navigation.navigateTo(Screens.UsersPaginationScreen);
+// };

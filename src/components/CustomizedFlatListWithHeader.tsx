@@ -10,21 +10,23 @@ import {
 } from 'react-native';
 import {UserState} from '../screens/UsersListScroll/usersReducer';
 import {generateKeyExtrator} from '../utils/strings';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import {useSelector} from 'react-redux';
+import {TextInput, TouchableOpacity} from 'react-native-gesture-handler';
+import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../reducer/RootReducer';
-import {navigateToPaginationScreen} from '../screens/UsersListScroll/helpers';
+import {AnyAction, Dispatch} from 'redux';
+import {userListViewActions} from '../screens/UsersListScroll/actions';
+import {BaseColors} from '../theme/colors';
 
 type Props = {
   data: UserState[];
   onEnd?: () => void;
   onRefrech?: () => void;
-  scrollToChart: string;
 };
 
 export default function CustomizedFlatList(props: Props) {
   const [refreshing, setIsRefreshing] = useState(false);
   const [listRef, setListRef] = useState<FlatList<UserState> | null>(null);
+  const dispatch = useDispatch();
   const {scrollToChart}: any = useSelector<RootState>(
     _state => _state.usersReducer,
   );
@@ -41,7 +43,7 @@ export default function CustomizedFlatList(props: Props) {
 
   return (
     <>
-      {renderHeader(listRef, props.data, scrollToChart)}
+      {renderHeader(listRef, props.data, scrollToChart, dispatch)}
       <FlatList
         ref={list => setListRef(list)}
         data={props.data}
@@ -66,28 +68,46 @@ export default function CustomizedFlatList(props: Props) {
 const renderHeader = (
   listRef: FlatList<UserState> | null,
   data: UserState[],
-  chart: string,
-) => (
-  <View style={styles.headerContainer}>
-    <TouchableOpacity
-      style={styles.scrollButton}
-      onPress={navigateToPaginationScreen}>
-      <Text style={styles.textScrollStyle}>select new Chart</Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-      style={styles.scrollButton}
-      onPress={() =>
-        listRef?.scrollToItem({
-          item: getFirstItemsBylettersInList(data, chart),
-          animated: true,
-        })
-      }>
-      <Text style={styles.textScrollStyle}>
-        Scroll to names starts with {chart}
-      </Text>
-    </TouchableOpacity>
-  </View>
-);
+  char: string,
+  dispatch: Dispatch<AnyAction>,
+) => {
+  const onCharChanged = (value: string) => {
+    if ((typeof value === 'string' && value.length === 1) || value === '') {
+      dispatch(userListViewActions.scrollToChart(value));
+    }
+  };
+
+  const isScrollButtonDisabled = (): boolean => !char;
+
+  const getScrollButtontext = (): string => {
+    if (char) {
+      return `Click to Scroll to names starts with ${char}`;
+    }
+    return 'Please type a Letter to scroll';
+  };
+
+  return (
+    <View style={styles.headerContainer}>
+      <TouchableOpacity
+        disabled={isScrollButtonDisabled()}
+        style={styles.scrollButton}
+        onPress={() =>
+          listRef?.scrollToItem({
+            item: getFirstItemsBylettersInList(data, char),
+            animated: true,
+          })
+        }>
+        <Text style={styles.textScrollStyle}>{getScrollButtontext()}</Text>
+      </TouchableOpacity>
+      <TextInput
+        maxLength={1}
+        style={styles.input}
+        numberOfLines={1}
+        onChangeText={onCharChanged}
+      />
+    </View>
+  );
+};
 
 const onEndHandler = ({distanceFromEnd}: any) =>
   //   onEnd: (() => void) | undefined,
@@ -166,10 +186,16 @@ const styles = StyleSheet.create({
     padding: 5,
     fontWeight: '300',
     borderStyle: 'dotted',
-    // backgroundColor: '#109509',
+    borderColor: BaseColors.Primary,
+    backgroundColor: BaseColors.Button,
   },
   textScrollStyle: {
-    // color: '#ffff',
     fontWeight: '300',
+  },
+  input: {
+    width: 50,
+    height: 25,
+    borderWidth: 1,
+    borderColor: BaseColors.Button,
   },
 });
