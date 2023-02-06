@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   pageNumber: {
-    marginHorizontal: 4,
+    marginHorizontal: 10,
   },
 });
 

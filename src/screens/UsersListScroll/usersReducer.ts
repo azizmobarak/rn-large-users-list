@@ -35,7 +35,6 @@ export const UsersReducer: Reducer<UsersListState> = (
     case userListViewActionsType.fillUserList: {
       const {data, lastPage, currentPage, lenght}: ListUsersResponse =
         action.payload;
-      console.log('cheeeck', currentPage);
       return {
         ...state,
         users: data,
