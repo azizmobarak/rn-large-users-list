@@ -1,6 +1,6 @@
-import {ListUsersResponse} from '../../utils/typing';
+import {UserState} from '../../screens/UsersListScroll/usersReducer';
 import {Observable} from 'rxjs';
 
 export interface RestService {
-  getUsersList: () => Observable<ListUsersResponse>;
+  getUsersList: () => Observable<UserState[]>;
 }

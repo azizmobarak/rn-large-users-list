@@ -1,13 +1,14 @@
 import {RestServicesImp} from '../../services/api/RestServiceImp';
 import {userListViewActions} from './actions';
-import {ListUsersResponse, RemoteData} from '../../utils/typing';
+import {RemoteData} from '../../utils/typing';
 import {store} from '../../reducer/store';
+import {UserState} from './usersReducer';
 
-export function getUsersList(page: number): void {
-  const service = new RestServicesImp(page);
+export function getUsersList(): void {
+  const service = new RestServicesImp();
   const {dispatch} = store;
 
-  service.getUsersList().subscribe((result: ListUsersResponse | undefined) => {
+  service.getUsersList().subscribe((result: UserState[] | undefined) => {
     if (!result) {
       dispatch(userListViewActions.onError(RemoteData.Error));
     } else {

@@ -3,6 +3,7 @@ import {Screens} from './Screens';
 import {createStackNavigator} from '@react-navigation/stack';
 import {UserListScrollScreen} from '../../screens/UsersListScroll/UsersListScrollScreen';
 import {NavigatorScreenParams} from '@react-navigation/native';
+import {CahrSelectScreen} from '../../screens/charSelect/cahrSelectScreen';
 
 // ps: the comments here just for explaining and not nedeed since every function and var has a meaning by it's name
 
@@ -10,6 +11,7 @@ import {NavigatorScreenParams} from '@react-navigation/native';
 // any screen in navigation will be added here with params
 export type UsersNavigation = {
   [Screens.UsersListScreen]: undefined;
+  [Screens.CharSlelectScreen]: undefined;
 };
 
 export type RootNavigation = {
@@ -26,7 +28,16 @@ const UsersNavigationNavigator: FC = () => {
 
   return (
     <Navigator>
-      <Screen name={Screens.UsersListScreen} component={UserListScrollScreen} />
+      <Screen
+        options={{headerShown: false}}
+        name={Screens.UsersListScreen}
+        component={UserListScrollScreen}
+      />
+      <Screen
+        options={{presentation: 'modal'}}
+        name={Screens.CharSlelectScreen}
+        component={CahrSelectScreen}
+      />
     </Navigator>
   );
 };

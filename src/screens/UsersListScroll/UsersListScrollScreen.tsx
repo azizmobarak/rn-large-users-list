@@ -1,94 +1,36 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ActivityIndicator,
-  Button,
-  ViewStyle,
-} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import headerBuilder from '../../services/Navigation/headerBuilder';
+import React, {useEffect} from 'react';
+import {View, Text, StyleSheet, ActivityIndicator, Button} from 'react-native';
 import CustomizedFlatList from '../../components/CustomizedFlatListWithHeader';
 import {getUsersList} from './getUserListService';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../reducer/RootReducer';
 import RemoteDataComponent from '../../components/RemoteData';
-import {buildUsersListPresenter} from './usersPresenter';
-import {NavigationState} from '../../utils/typing';
 import {BaseColors} from '../../theme/colors';
+import {userListViewActions} from './actions';
+import {buildUsersListPresenter} from './usersPresenter';
 
 function UsersScreen() {
-  const navigation = useNavigation();
-  const [usersData, setUsersData] = useState([]);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [isLoading, setLoading] = useState<boolean>(false);
-  const {users, currentPage, state, lastPage}: any = useSelector<RootState>(
+  const dispatch = useDispatch();
+  const {users, state}: any = useSelector<RootState>(
     _state => _state.usersReducer,
   );
-  const [sortTo, setSortTo] = useState(1);
-  const {pagination, title} = buildUsersListPresenter(
-    currentPage,
-    lastPage,
-    users,
-    sortTo,
-    state,
-  );
 
   useEffect(() => {
-    setUsersData(users as []);
-  }, [users]);
+    getUsersList();
+  }, []);
 
-  useEffect(() => {
-    navigation.addListener(NavigationState.Focus, () =>
-      getUsersList(pageNumber),
-    );
-    return () =>
-      navigation.removeListener(NavigationState.Blur, () =>
-        getUsersList(pageNumber),
-      );
-  }, [pageNumber, navigation]);
-
-  const onEnd = () => {
-    const newEnd: number = pageNumber + 1;
-    setPageNumber(newEnd);
-    setLoading(true);
-    getUsersList(pageNumber);
-    setLoading(true);
+  const onListSort = () => {
+    const {sortedList} = buildUsersListPresenter(users, 1);
+    dispatch(userListViewActions.loadList());
+    dispatch(userListViewActions.getUsers(sortedList));
   };
-
-  const onRefrech = () => {
-    const newEnd: number = pageNumber + 1;
-    setPageNumber(newEnd);
-    getUsersList(pageNumber);
-  };
-
-  useEffect(() => {
-    navigation.setOptions(
-      headerBuilder({
-        title,
-      }),
-    );
-  }, [navigation, title]);
-
-  const navigate = useCallback(
-    (isNext: boolean) => {
-      const newEnd: number = pageNumber + (isNext ? 1 : -1);
-      setPageNumber(newEnd);
-      setLoading(true);
-      getUsersList(pageNumber);
-      setLoading(false);
-    },
-    [pageNumber],
-  );
 
   const renderError = () => (
     <View style={styles.error}>
       <Text style={styles.errorText}>Error No Data Provided</Text>
       <Button
         title={'referch'}
-        onPress={() => getUsersList(pageNumber)}
+        onPress={() => getUsersList()}
         color={'#8777'}
       />
     </View>
@@ -102,100 +44,9 @@ function UsersScreen() {
 
   const renderView = () => (
     <View style={styles.container}>
-      <View style={styles.buttonsContainer}>
-        <View style={styles.filterContainer}>
-          <Text style={styles.filterText}>Sort List</Text>
-          <View style={styles.filterListButtonsContainer}>
-            <TouchableOpacity
-              disabled={sortTo === 1}
-              onPress={() => setSortTo(1)}
-              style={[
-                styles.filterButton,
-                getButtonDisabledStyle(sortTo === 1),
-              ]}>
-              <Text style={styles.filterButtonText}>{'A -> Z'}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              disabled={sortTo === -1}
-              onPress={() => setSortTo(-1)}
-              style={[
-                styles.filterButton,
-                getButtonDisabledStyle(sortTo === -1),
-              ]}>
-              <Text style={styles.filterButtonText}>{'Z -> A'}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-      <CustomizedFlatList
-        onRefrech={onRefrech}
-        onEnd={onEnd}
-        data={usersData}
-      />
-      {isBottomLoader()}
-      {pagination.length === 4
-        ? renderPagination()
-        : renderPaginationSimpleButtons()}
+      <CustomizedFlatList onSortList={onListSort} data={users} />
     </View>
   );
-
-  const renderPagination = () => {
-    return (
-      <>
-        {pagination.forEach((page: number) => (
-          <View style={styles.paginationContainer}>
-            <TouchableOpacity style={styles.paginationButtons}>
-              <Text>{page}</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
-      </>
-    );
-  };
-
-  const renderPaginationSimpleButtons = () => {
-    return (
-      <View style={styles.simplePaginationContainer}>
-        <TouchableOpacity
-          disabled={pageNumber === 1}
-          onPress={() => navigate(false)}
-          style={styles.simplePaginationButtons}>
-          <Text>{'<<<<'}</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.pageNumber}>
-          {pageNumber} / {lastPage}
-        </Text>
-
-        <TouchableOpacity
-          disabled={pageNumber === lastPage}
-          onPress={() => navigate(true)}
-          style={styles.simplePaginationButtons}>
-          <Text>{'>>>>'}</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
-
-  const isBottomLoader = () => {
-    if (isLoading) {
-      return (
-        <View style={styles.loader}>
-          <ActivityIndicator color={BaseColors.Secondary} />
-        </View>
-      );
-    }
-    return null;
-  };
-
-  const getButtonDisabledStyle = (isDisabled: boolean): ViewStyle => {
-    if (isDisabled) {
-      return {
-        backgroundColor: 'gray',
-      };
-    }
-    return {};
-  };
 
   return (
     <RemoteDataComponent
